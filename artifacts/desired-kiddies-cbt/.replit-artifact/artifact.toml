@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Desired Kiddies CBT"
+description = "A responsive online CBT examination platform for students to register, take timed multiple-choice examinations, receive scores, and for administrators to manage academic content and results."
+version = "1.0.0"
+id = "artifacts/desired-kiddies-cbt"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22167
+
+[services.development]
+run = "pnpm --filter @workspace/desired-kiddies-cbt run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/desired-kiddies-cbt", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/desired-kiddies-cbt/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22167"
+BASE_PATH = "/"

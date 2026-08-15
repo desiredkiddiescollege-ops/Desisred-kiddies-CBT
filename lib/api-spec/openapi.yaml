@@ -10,6 +10,12 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: account
+    description: Signed-in account operations
+  - name: student
+    description: Student examination operations
+  - name: admin
+    description: Administrator operations
 paths:
   /healthz:
     get:
@@ -24,7 +30,501 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /school-info:
+    get:
+      operationId: getSchoolInfo
+      tags: [account]
+      summary: Get public school information
+      responses:
+        "200":
+          description: School information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchoolInfo"
+  /result-checker/check:
+    post:
+      operationId: checkResult
+      tags: [student]
+      summary: Check a result using an examination number and EPIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResultCheckInput"
+      responses:
+        "200":
+          description: Checked result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultCheckResponse"
+  /me:
+    get:
+      operationId: getMe
+      tags: [account]
+      summary: Get the current account
+      responses:
+        "200":
+          description: Current account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [student]
+      summary: Get the student dashboard summary
+      responses:
+        "200":
+          description: Student dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /exams:
+    get:
+      operationId: listExams
+      tags: [student]
+      summary: List available examinations
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, upcoming, live, completed]
+            default: all
+      responses:
+        "200":
+          description: Examinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exam"
+  /exams/{examId}:
+    get:
+      operationId: getExam
+      tags: [student]
+      summary: Get an examination and its questions
+      parameters:
+        - $ref: "#/components/parameters/ExamId"
+      responses:
+        "200":
+          description: Examination details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExamDetail"
+  /exams/{examId}/attempts:
+    post:
+      operationId: startAttempt
+      tags: [student]
+      summary: Start or resume an examination attempt
+      parameters:
+        - $ref: "#/components/parameters/ExamId"
+      responses:
+        "201":
+          description: Examination attempt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attempt"
+  /attempts/{attemptId}:
+    get:
+      operationId: getAttempt
+      tags: [student]
+      summary: Get a current attempt
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Attempt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attempt"
+  /attempts/{attemptId}/answers:
+    patch:
+      operationId: saveAttemptAnswer
+      tags: [student]
+      summary: Save one answer in an attempt
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerInput"
+      responses:
+        "200":
+          description: Updated attempt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attempt"
+  /attempts/{attemptId}/submit:
+    post:
+      operationId: submitAttempt
+      tags: [student]
+      summary: Submit an examination attempt and calculate its score
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Examination result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+  /results:
+    get:
+      operationId: listResults
+      tags: [student]
+      summary: List the current student's results
+      responses:
+        "200":
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+  /admin/summary:
+    get:
+      operationId: getAdminSummary
+      tags: [admin]
+      summary: Get administrator dashboard summary
+      responses:
+        "200":
+          description: Administrator dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSummary"
+  /admin/school-info:
+    patch:
+      operationId: updateSchoolInfo
+      tags: [admin]
+      summary: Update school information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchoolInfoInput"
+      responses:
+        "200":
+          description: Updated school information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchoolInfo"
+  /admin/epins:
+    get:
+      operationId: listEpins
+      tags: [admin]
+      summary: List result checker EPINs
+      responses:
+        "200":
+          description: EPINs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Epin"
+    post:
+      operationId: generateEpins
+      tags: [admin]
+      summary: Generate one or more result checker EPINs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EpinGenerateInput"
+      responses:
+        "201":
+          description: Generated EPINs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Epin"
+  /admin/epins/{epinId}:
+    patch:
+      operationId: updateEpin
+      tags: [admin]
+      summary: Disable or reactivate an EPIN
+      parameters:
+        - $ref: "#/components/parameters/EpinId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EpinUpdate"
+      responses:
+        "200":
+          description: Updated EPIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Epin"
+  /admin/students:
+    get:
+      operationId: listStudents
+      tags: [admin]
+      summary: List registered students
+      responses:
+        "200":
+          description: Students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+  /admin/subjects:
+    get:
+      operationId: listSubjects
+      tags: [admin]
+      summary: List subjects
+      responses:
+        "200":
+          description: Subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subject"
+    post:
+      operationId: createSubject
+      tags: [admin]
+      summary: Create a subject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectInput"
+      responses:
+        "201":
+          description: Created subject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+  /admin/subjects/{subjectId}:
+    patch:
+      operationId: updateSubject
+      tags: [admin]
+      summary: Update a subject
+      parameters:
+        - $ref: "#/components/parameters/SubjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectInput"
+      responses:
+        "200":
+          description: Updated subject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+    delete:
+      operationId: deleteSubject
+      tags: [admin]
+      summary: Delete a subject
+      parameters:
+        - $ref: "#/components/parameters/SubjectId"
+      responses:
+        "204":
+          description: Subject deleted
+  /admin/questions:
+    get:
+      operationId: listQuestions
+      tags: [admin]
+      summary: List questions in the question bank
+      parameters:
+        - name: subjectId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+    post:
+      operationId: createQuestion
+      tags: [admin]
+      summary: Create a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionInput"
+      responses:
+        "201":
+          description: Created question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+  /admin/questions/{questionId}:
+    patch:
+      operationId: updateQuestion
+      tags: [admin]
+      summary: Update a question
+      parameters:
+        - $ref: "#/components/parameters/QuestionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionInput"
+      responses:
+        "200":
+          description: Updated question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+    delete:
+      operationId: deleteQuestion
+      tags: [admin]
+      summary: Delete a question
+      parameters:
+        - $ref: "#/components/parameters/QuestionId"
+      responses:
+        "204":
+          description: Question deleted
+  /admin/exams:
+    get:
+      operationId: listAdminExams
+      tags: [admin]
+      summary: List examinations for management
+      responses:
+        "200":
+          description: Examinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exam"
+    post:
+      operationId: createExam
+      tags: [admin]
+      summary: Create an examination
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamInput"
+      responses:
+        "201":
+          description: Created examination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exam"
+  /admin/exams/{examId}:
+    patch:
+      operationId: updateExam
+      tags: [admin]
+      summary: Update an examination
+      parameters:
+        - $ref: "#/components/parameters/ExamId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamInput"
+      responses:
+        "200":
+          description: Updated examination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exam"
+    delete:
+      operationId: deleteExam
+      tags: [admin]
+      summary: Delete an examination
+      parameters:
+        - $ref: "#/components/parameters/ExamId"
+      responses:
+        "204":
+          description: Examination deleted
+  /admin/results:
+    get:
+      operationId: listAdminResults
+      tags: [admin]
+      summary: List all examination results
+      responses:
+        "200":
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
 components:
+  parameters:
+    ExamId:
+      name: examId
+      in: path
+      required: true
+      schema:
+        type: integer
+    EpinId:
+      name: epinId
+      in: path
+      required: true
+      schema:
+        type: integer
+    AttemptId:
+      name: attemptId
+      in: path
+      required: true
+      schema:
+        type: integer
+    SubjectId:
+      name: subjectId
+      in: path
+      required: true
+      schema:
+        type: integer
+    QuestionId:
+      name: questionId
+      in: path
+      required: true
+      schema:
+        type: integer
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +533,235 @@ components:
           type: string
       required:
         - status
+    Account:
+      type: object
+      required: [id, name, email, role, studentNumber]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        studentNumber: { type: string }
+        role:
+          type: string
+          enum: [student, admin]
+    Subject:
+      type: object
+      required: [id, name, code, questionCount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        code: { type: string }
+        questionCount: { type: integer }
+    SubjectInput:
+      type: object
+      required: [name, code]
+      properties:
+        name: { type: string, minLength: 1 }
+        code: { type: string, minLength: 1 }
+    Exam:
+      type: object
+      required: [id, title, subjectId, subjectName, dateLabel, durationMinutes, questionCount, status, color]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        subjectId: { type: integer }
+        subjectName: { type: string }
+        dateLabel: { type: string }
+        startAt: { type: ["string", "null"], format: date-time }
+        durationMinutes: { type: integer }
+        questionCount: { type: integer }
+        status:
+          type: string
+          enum: [upcoming, live, completed, draft]
+        color: { type: string }
+        averageScore: { type: ["number", "null"] }
+    ExamInput:
+      type: object
+      required: [title, subjectId, durationMinutes, status]
+      properties:
+        title: { type: string, minLength: 1 }
+        subjectId: { type: integer }
+        durationMinutes: { type: integer, minimum: 1 }
+        startAt: { type: ["string", "null"], format: date-time }
+        status:
+          type: string
+          enum: [upcoming, live, completed, draft]
+        color: { type: string }
+        questionIds:
+          type: array
+          items: { type: integer }
+    Question:
+      type: object
+      required: [id, subjectId, subjectName, text, options, correctOption, difficulty]
+      properties:
+        id: { type: integer }
+        subjectId: { type: integer }
+        subjectName: { type: string }
+        text: { type: string }
+        options:
+          type: array
+          items: { type: string }
+        correctOption: { type: integer }
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+    QuestionInput:
+      type: object
+      required: [subjectId, text, options, correctOption, difficulty]
+      properties:
+        subjectId: { type: integer }
+        text: { type: string, minLength: 1 }
+        options:
+          type: array
+          minItems: 2
+          items: { type: string }
+        correctOption: { type: integer, minimum: 0 }
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+    ExamDetail:
+      type: object
+      required: [exam, questions]
+      properties:
+        exam:
+          $ref: "#/components/schemas/Exam"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+    AnswerInput:
+      type: object
+      required: [questionId, selectedOption]
+      properties:
+        questionId: { type: integer }
+        selectedOption: { type: integer, minimum: 0 }
+    Attempt:
+      type: object
+      required: [id, examId, startedAt, expiresAt, status, answers]
+      properties:
+        id: { type: integer }
+        examId: { type: integer }
+        startedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        status:
+          type: string
+          enum: [in_progress, submitted, expired]
+        answers:
+          type: object
+          additionalProperties:
+            type: integer
+    Result:
+      type: object
+      required: [id, examId, examTitle, studentName, studentNumber, score, totalQuestions, percentage, submittedAt, passed]
+      properties:
+        id: { type: integer }
+        examId: { type: integer }
+        examTitle: { type: string }
+        studentName: { type: string }
+        studentNumber: { type: string }
+        score: { type: integer }
+        totalQuestions: { type: integer }
+        percentage: { type: number }
+        submittedAt: { type: string, format: date-time }
+        passed: { type: boolean }
+    DashboardSummary:
+      type: object
+      required: [activeExams, completedExams, averageScore, recentResults]
+      properties:
+        activeExams: { type: integer }
+        completedExams: { type: integer }
+        averageScore: { type: number }
+        recentResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+    Student:
+      type: object
+      required: [id, name, email, studentNumber, examsTaken, averageScore, joinedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        studentNumber: { type: string }
+        examsTaken: { type: integer }
+        averageScore: { type: number }
+        joinedAt: { type: string, format: date-time }
+    AdminSummary:
+      type: object
+      required: [students, subjects, questions, examinations, averageScore, recentResults]
+      properties:
+        students: { type: integer }
+        subjects: { type: integer }
+        questions: { type: integer }
+        examinations: { type: integer }
+        averageScore: { type: number }
+        recentResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/Result"
+    SchoolInfo:
+      type: object
+      required: [id, schoolName, proprietor, headmistress, phonePrimary, phoneSecondary, email]
+      properties:
+        id: { type: integer }
+        schoolName: { type: string }
+        proprietor: { type: string }
+        headmistress: { type: string }
+        phonePrimary: { type: string }
+        phoneSecondary: { type: string }
+        email: { type: string, format: email }
+    SchoolInfoInput:
+      type: object
+      required: [schoolName, proprietor, headmistress, phonePrimary, phoneSecondary, email]
+      properties:
+        schoolName: { type: string, minLength: 1 }
+        proprietor: { type: string, minLength: 1 }
+        headmistress: { type: string, minLength: 1 }
+        phonePrimary: { type: string, minLength: 1 }
+        phoneSecondary: { type: string, minLength: 1 }
+        email: { type: string, format: email }
+    Epin:
+      type: object
+      required: [id, code, status, uses, maxUses, expiresAt, generatedAt, lastUsedAt]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        status:
+          type: string
+          enum: [unused, used, expired, disabled]
+        uses: { type: integer }
+        maxUses: { type: integer }
+        expiresAt: { type: ["string", "null"], format: date-time }
+        generatedAt: { type: string, format: date-time }
+        lastUsedAt: { type: ["string", "null"], format: date-time }
+    EpinGenerateInput:
+      type: object
+      required: [quantity, maxUses]
+      properties:
+        quantity: { type: integer, minimum: 1, maximum: 1000 }
+        maxUses: { type: integer, minimum: 1, maximum: 100 }
+        expiresAt: { type: ["string", "null"], format: date-time }
+    EpinUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [active, disabled]
+        expiresAt: { type: ["string", "null"], format: date-time }
+        maxUses: { type: integer, minimum: 1, maximum: 100 }
+    ResultCheckInput:
+      type: object
+      required: [examinationNumber, epin]
+      properties:
+        examinationNumber: { type: string, minLength: 1 }
+        epin: { type: string, minLength: 6 }
+    ResultCheckResponse:
+      type: object
+      required: [school, result]
+      properties:
+        school:
+          $ref: "#/components/schemas/SchoolInfo"
+        result:
+          $ref: "#/components/schemas/Result"
 

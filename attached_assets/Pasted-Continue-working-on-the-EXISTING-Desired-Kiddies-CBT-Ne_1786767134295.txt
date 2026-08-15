@@ -1,0 +1,173 @@
+Continue working on the EXISTING Desired Kiddies CBT Next.js project. Do NOT rebuild the application from scratch, do NOT delete or replace the existing database structure, and do NOT remove the working CBT functionality that has already been created.
+
+The current application already has the main Next.js frontend, database structure, server endpoints, student portal, examination flows, scoring, and administrator functionality. Keep all working functionality and make only the changes necessary to complete the following requirements.
+
+1. Desired Kiddies College school information
+
+Replace generic/demo school information with:
+
+School Name: Desired Kiddies College
+Proprietor/Principal: Mr. Sunday Bibitayo Ojeleke
+Headmistress: Mrs. Omolara Ojeleke
+Contact Numbers: 08038020039 / 08137606650
+School Email: desiredkiddiescollege@gmail.com
+
+Create a professional School Information/About/Contact section and display the appropriate information throughout the application where useful.
+
+Store the school information in the database so an authorized administrator can edit it from the admin dashboard without modifying source code.
+
+2. Real Result Checker with EPIN
+
+Implement a complete database-backed Result Checker EPIN system.
+
+Admin EPIN management
+
+Authorized administrators must be able to:
+
+- Generate a single EPIN.
+- Generate EPINs in bulk.
+- Generate quantities such as 1, 10, 50, 100, 500 or 1,000.
+- Generate cryptographically strong unique EPIN codes.
+- View generated EPINs in the admin dashboard.
+- See each EPIN's status: Unused, Used, Expired, or Disabled.
+- Set an expiry date where required.
+- Set the maximum number of times an EPIN can be used.
+- Disable or reactivate an EPIN.
+- View when an EPIN was generated and used.
+- Prevent duplicate EPINs.
+- Never expose sensitive server/database credentials.
+
+Use the database to persist all EPIN information.
+
+Student Result Checker
+
+Create a clear Check Result page.
+
+A student should be able to enter:
+
+- Examination number / student ID
+- EPIN
+
+The system must:
+
+1. Validate the EPIN securely on the server.
+2. Check that it exists and is active.
+3. Check its expiry and usage limit.
+4. Verify the examination number/student ID.
+5. Retrieve the correct result from the database.
+6. Display the student's result clearly.
+7. Record EPIN usage according to its configured usage limit.
+8. Prevent unauthorized users from viewing another student's result.
+9. Show useful error messages when an EPIN or examination number is invalid.
+
+Do not create a fake result-checker that only looks functional on the frontend. It must use the actual database and server-side validation.
+
+3. Remove demo/sample information
+
+The current preview contains sample/demo information such as:
+
+- Ada
+- 72% progress
+- 84% average score
+- 03 active exams
+- 2 exams completed
+- Other placeholder student information
+
+Do not present these as real school data.
+
+Replace demo content with appropriate empty states when there is no real data, for example:
+
+"No examinations available yet."
+
+"No results available yet."
+
+Do not invent real student records or examination results.
+
+4. Student CBT system
+
+Preserve and complete the existing CBT functionality.
+
+Students should be able to:
+
+- Create an account/sign in.
+- See examinations assigned to them.
+- Select an available examination.
+- See instructions before starting.
+- Take timed multiple-choice questions.
+- Navigate between questions.
+- Save answers as they progress.
+- Submit the examination.
+- Automatically calculate the score.
+- Save the attempt and result to the database.
+- View their result when permitted.
+
+Ensure the timer, submission, scoring, and database persistence work correctly.
+
+5. Administrator dashboard
+
+Ensure the existing administrator area supports:
+
+- Students
+- Classes
+- Subjects
+- Examinations
+- Questions
+- Results
+- EPIN generation and management
+- School information
+
+Only authorized administrators should have access to administrative operations.
+
+6. Supabase
+
+Use the existing Supabase/database setup if it is already configured.
+
+If Supabase environment variables are missing, do NOT put credentials directly into source code. Use Replit Secrets/environment variables for the required values.
+
+Never expose a Supabase service-role/private key to the browser or client-side JavaScript.
+
+Preserve the existing database structure where possible and add only the tables/columns/indexes/security policies necessary for the EPIN and school-information functionality.
+
+7. Security
+
+Use server-side validation for EPIN verification and result access.
+
+Students must not be able to modify their own scores, examination results, EPIN status, or administrative data through the browser.
+
+Do not trust client-side values for scores, permissions, EPIN validity, or user roles.
+
+Use appropriate database security/RLS policies where applicable.
+
+8. Mobile-first design
+
+The application will mainly be used on Android phones.
+
+Make sure:
+
+- Buttons are easy to tap.
+- Forms work properly on small screens.
+- CBT questions are easy to read.
+- The timer is clearly visible.
+- The result checker is simple to use.
+- Admin pages remain usable on mobile.
+- The existing professional design is preserved.
+
+9. Final testing
+
+After implementing the changes:
+
+- Check for TypeScript/build errors.
+- Check all relevant routes.
+- Check authentication.
+- Check database operations.
+- Test generating an EPIN.
+- Test using an unused EPIN to check a result.
+- Test an invalid EPIN.
+- Test an expired/disabled EPIN.
+- Test EPIN usage limits.
+- Test that a student cannot access another student's result.
+- Check the mobile layout.
+- Remove obvious placeholder/demo data.
+- Fix integration errors you find.
+
+IMPORTANT: Do not unnecessarily rewrite working parts of the application. Continue from the existing project and prioritize completing the missing EPIN Result Checker and real school information functionality.
