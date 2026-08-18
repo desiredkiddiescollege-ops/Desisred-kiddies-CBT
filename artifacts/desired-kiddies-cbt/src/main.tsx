@@ -17,4 +17,3 @@ createRoot(document.getElementById('root')!).render(
     DESIRED KIDDIES CBT IS WORKING
   </div>
 );
-);
