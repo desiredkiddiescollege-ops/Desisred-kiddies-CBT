@@ -115,9 +115,7 @@ function Router(){return <RoutedErrorBoundary><Switch><Route path="/" component=
 function ClerkCacheInvalidator(){const {addListener}=useClerk();const qc=useQueryClient();useEffect(()=>{let previous:string|undefined;return addListener(({user})=>{const next=user?.id;if(previous!==undefined&&next!==previous)qc.clear();previous=next;});},[addListener,qc]);return null;}
 function ClerkRoutes(){const [,setLocation]=useLocation();return <ClerkProvider publishableKey={clerkPubKey} proxyUrl={clerkProxyUrl} appearance={appearance} signInUrl={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} localization={{signIn:{start:{title:'Welcome back',subtitle:'Pick up where you left off'}},signUp:{start:{title:'Make room to grow',subtitle:'Your learning space starts here'}}}} routerPush={to=>setLocation(stripBase(to))} routerReplace={to=>setLocation(stripBase(to),{replace:true})}><QueryClientProvider client={queryClient}><ClerkCacheInvalidator/><Router/></QueryClientProvider></ClerkProvider>;}
 function App() {
-  return (
-    <div style={{ padding: '40px', fontSize: '30px' }}>
-      DESIRED KIDDIES CBT IS WORKING
-    </div>
-  );
+  return <ClerkRoutes />;
 }
+
+export default App;
